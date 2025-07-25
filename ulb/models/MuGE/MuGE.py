@@ -7,6 +7,8 @@ from torch.distributions import Normal, Independent
 from ..default_model import default_model
 from .UAED_MuGE import Mymodel as net
 
+from ignite.metrics import PSNR
+
 class MuGE(default_model):
 
     def __init__(self, opt):
@@ -28,6 +30,8 @@ class MuGE(default_model):
         # self.tb_writer.add_graph(self.de_parallelize_model(), dummpy_inpt)
 
         self.test_imgs_list = []
+
+        self.psnr_metric = PSNR(data_range=1.0)
 
     def set_input(self, data):
         self.img = data['lr'].to(self.device)
@@ -61,8 +65,17 @@ class MuGE(default_model):
         with torch.no_grad():
             self.forward()
         outputs = self.sample_from_output_dist()
-        self.test_imgs_list.append(self.img[0])
-        self.test_imgs_list.append(outputs[0])
+
+        y_pred = outputs
+        y_true = self.gt
+
+        self.psnr_metric.update((y_pred, y_true))
+        psnr_value = self.psnr_metric.compute()
+
+        # Store first few samples for visualization
+        self.test_imgs_list.extend([y_true[0], y_pred[0]])
+
+        return psnr_value
 
 
     def write_image(self):
