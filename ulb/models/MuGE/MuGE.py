@@ -60,9 +60,9 @@ class MuGE(default_model):
     def test_forward(self):
         with torch.no_grad():
             self.forward()
-        img = self.sample_from_output_dist()
+        outputs = self.sample_from_output_dist()
         self.test_imgs_list.append(self.img[0])
-        self.test_imgs_list.append(img[0])
+        self.test_imgs_list.append(outputs[0])
 
 
     def write_image(self):

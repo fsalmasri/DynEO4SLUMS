@@ -21,13 +21,15 @@ if __name__ == '__main__':
         train_bar = tqdm(trainLoader)
         for data in train_bar:
             model.set_input(data)
+            model.test_forward()
+            exit()
             model.optimize_parameters()
 
             train_bar.set_description(f'[TRAIN] {model.epoch}/{opt.epochs} | Loss : {np.mean(model.loss_epoch_train)}')
 
-        # for data in valLoader:
-        #     model.set_input(data)
-        #     model.test_forward()
+        for data in valLoader:
+            model.set_input(data)
+            model.test_forward()
 
         # model.write_image()
 
