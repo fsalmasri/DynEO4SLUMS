@@ -29,7 +29,7 @@ if __name__ == '__main__':
         #     model.set_input(data)
         #     model.test_forward()
 
-        model.write_image()
+        # model.write_image()
 
 
 
