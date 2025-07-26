@@ -33,7 +33,7 @@ if __name__ == '__main__':
 
         model.tb_writer.add_scalar('Test/psnr', np.mean(total_psnr), model.epoch)
 
-        # model.write_image()
+        model.write_image()
 
 
 
