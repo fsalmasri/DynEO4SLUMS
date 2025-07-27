@@ -10,18 +10,15 @@ class PlanetScope(torch.utils.data.Dataset):
     def __init__(self, opt, train=True, aug=False):
 
         self.opt = opt
-        self.DS_path = opt.DS_path
         self.augment = aug
         self.train = train
 
-        self.imfiles = sorted(os.listdir(self.DS_path))
-        self.tr_lst = self.imfiles[50:]
-        self.vd_lst = self.imfiles[:50]
-
-        if self.train:
-            self.imgs_lst = self.tr_lst
+        if train:
+            self.DS_path = os.path.join(opt.DS_path, 'train')
         else:
-            self.imgs_lst = self.vd_lst
+            self.DS_path = os.path.join(opt.DS_path, 'valid')
+
+        self.imgs_lst = sorted(os.listdir(self.DS_path))
 
 
     def __len__(self):
@@ -32,17 +29,22 @@ class PlanetScope(torch.utils.data.Dataset):
         scale_factor = 2
         img_name = os.path.basename(self.imgs_lst[idx])
         img = load_planetscope_channels(os.path.join(self.DS_path, self.imgs_lst[idx]))['rgb']
-        img = normalize_tile(img)
+        img, min_norm, max_norm = normalize_tile(img)
 
         lr = resize_opencv_tensor(img, scale_factor)
 
 
         img = torch.from_numpy(img).float()
         lr = torch.from_numpy(lr).float()
+        min_norm = torch.from_numpy(min_norm).float()
+        max_norm = torch.from_numpy(max_norm).float()
+
 
         data = {
             'lr': lr,
             'hr': img,
+            'min_norm': min_norm,
+            'max_norm': max_norm,
             'fname': img_name
         }
         return data
@@ -88,7 +90,7 @@ def normalize_tile(tile):
     tile_norm = (tile_flat - min_vals) / (max_vals - min_vals + 1e-6)
     tile_norm = np.clip(tile_norm, 0, 1)
 
-    return tile_norm.reshape(c, h, w)
+    return tile_norm.reshape(c, h, w), min_vals.squeeze(), max_vals.squeeze()
 
 def load_planetscope_channels(path):
     """
@@ -105,8 +107,6 @@ def load_planetscope_channels(path):
     """
 
     img = np.load(path).astype(np.float32)  # shape: (H, W, 8)
-    img = img.transpose(2, 0, 1)  # → (8, H, W)
-
     # Band groupings based on SuperDove spec
     visible = img[[1, 2, 3, 4, 5]]  # Blue, Green I, Green, Yellow, Red
     vegetation = img[[6, 7]]  # RedEdge, NIR
@@ -115,6 +115,7 @@ def load_planetscope_channels(path):
     r = img[5]  # Red
     g = img[3]  # Green
     b = img[1]  # Blue
+
     rgb = np.stack([r, g, b], axis=0)  # (3, H, W)
 
     return {
@@ -123,8 +124,6 @@ def load_planetscope_channels(path):
         "rgb": rgb,
         "all": img
     }
-
-    return bands
 
 
 

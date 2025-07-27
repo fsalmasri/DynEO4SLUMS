@@ -1,6 +1,7 @@
 
 log_dir: "logs/"
-DS_path: 'C:\Users\fsalm\Desktop\DynEO4SLUMS\nairobi\planetscope\nairobi_psb_sd_20230129_surfrefl_8bands_psscene_analytic_8b_sr_udm2\slices'
+#DS_path: 'C:\Users\fsalm\Desktop\DynEO4SLUMS\nairobi\planetscope\nairobi_psb_sd_20230129_surfrefl_8bands_psscene_analytic_8b_sr_udm2\slices'
+DS_path: 'C:\Users\fsalm\Desktop\DynEO4SLUMS\nairobi\planetscope\nairobi_psb_sd_20230129_surfrefl_8bands_psscene_analytic_8b_sr_udm2\ds'
 #DS_path: '/home/feras/Desktop/DynEO4SLUMS/nairobi_psb_sd_20230129_surfrefl_8bands_psscene_analytic_8b_sr_udm2/slices'
 
 im_size: 128

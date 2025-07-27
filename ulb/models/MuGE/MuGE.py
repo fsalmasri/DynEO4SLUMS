@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import torchvision
@@ -80,6 +81,14 @@ class MuGE(default_model):
 
     def write_image(self):
         img_grid = torchvision.utils.make_grid(self.test_imgs_list[:30], nrow=2)
+
+        import matplotlib.pyplot as plt
+        print(img_grid.shape)
+
+        plt.imshow(img_grid.permute(1, 2, 0).cpu().numpy())
+        plt.show()
+
+        exit()
         self.tb_writer.add_image('Edges construction test', img_grid, global_step=self.epoch)
 
 
@@ -88,3 +97,9 @@ class MuGE(default_model):
         self.test_imgs_list = []
 
 
+
+
+def denormalize_tile(tile_norm, min_vals, max_vals):
+    tile_flat = tile_norm.reshape(tile_norm.shape[0], -1)
+    tile_orig = tile_flat * (max_vals[:, None] - min_vals[:, None]) + min_vals[:, None]
+    return tile_orig.reshape(tile_norm.shape)
