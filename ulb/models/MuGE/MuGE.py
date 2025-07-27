@@ -81,14 +81,6 @@ class MuGE(default_model):
 
     def write_image(self):
         img_grid = torchvision.utils.make_grid(self.test_imgs_list[:30], nrow=2)
-
-        import matplotlib.pyplot as plt
-        print(img_grid.shape)
-
-        plt.imshow(img_grid.permute(1, 2, 0).cpu().numpy())
-        plt.show()
-
-        exit()
         self.tb_writer.add_image('Edges construction test', img_grid, global_step=self.epoch)
 
 
