@@ -12,11 +12,11 @@ nThreads: 1
 scale: 2
 
 dparallel: true
-epochs: 400
+epochs: 1000
 batchSize: 12
 load: false
 
-lr: 0.0001
+lr: 0.001
 weight_decay: 0.0005
 lrdecay_iter: 2000
 lrdecay_gamma: 0.5

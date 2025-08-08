@@ -31,18 +31,19 @@ class PlanetScope(torch.utils.data.Dataset):
         img = load_planetscope_channels(os.path.join(self.DS_path, self.imgs_lst[idx]))['rgb']
         img, min_norm, max_norm = normalize_tile(img)
 
-        lr = resize_opencv_tensor(img, scale_factor)
+        lr, bicubic = resize_opencv_tensor(img, scale_factor)
 
 
         img = torch.from_numpy(img).float()
         lr = torch.from_numpy(lr).float()
+        bicubic = torch.from_numpy(bicubic).float()
         min_norm = torch.from_numpy(min_norm).float()
         max_norm = torch.from_numpy(max_norm).float()
-
 
         data = {
             'lr': lr,
             'hr': img,
+            'bicubic': bicubic,
             'min_norm': min_norm,
             'max_norm': max_norm,
             'fname': img_name
@@ -59,8 +60,10 @@ def resize_opencv_tensor(img, scale_factor):
     img_np = img.transpose(1, 2, 0)  # (C, H, W) → (H, W, C)
     h, w = img_np.shape[:2]
     resized_np = cv2.resize(img_np, (w // scale_factor, h // scale_factor), interpolation=cv2.INTER_LINEAR)
+    bicubic_np = cv2.resize(resized_np, (w, h), interpolation=cv2.INTER_CUBIC)
     resized = resized_np.transpose(2, 0, 1)  # (H, W, C) → (C, H, W)
-    return resized
+    bicubic = bicubic_np.transpose(2, 0, 1)
+    return resized, bicubic
 
 
 

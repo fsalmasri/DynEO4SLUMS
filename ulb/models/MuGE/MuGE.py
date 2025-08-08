@@ -37,6 +37,7 @@ class MuGE(default_model):
     def set_input(self, data):
         self.img = data['lr'].to(self.device)
         self.gt = data['hr'].to(self.device)
+        self.bicubic = data['bicubic'].to(self.device)
 
 
     def forward(self):
@@ -69,18 +70,19 @@ class MuGE(default_model):
 
         y_pred = outputs
         y_true = self.gt
+        y_bic = self.bicubic
 
         self.psnr_metric.update((y_pred, y_true))
         psnr_value = self.psnr_metric.compute()
 
         # Store first few samples for visualization
-        self.test_imgs_list.extend([y_true[0], y_pred[0]])
+        self.test_imgs_list.extend([y_true[0], y_bic[0], y_pred[0]])
 
         return psnr_value
 
 
     def write_image(self):
-        img_grid = torchvision.utils.make_grid(self.test_imgs_list[:30], nrow=2)
+        img_grid = torchvision.utils.make_grid(self.test_imgs_list[:30], nrow=3)
         self.tb_writer.add_image('Edges construction test', img_grid, global_step=self.epoch)
 
 
